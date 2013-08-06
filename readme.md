@@ -9,6 +9,7 @@ This is a replacement for CodeIgniter's session library which utilizes drivers. 
 * Database
 * Native
 * Cache
+* Hybrid (native with database storage)
 
 There are a couple of new config options in config/session.php, and the 'sess_use_database' option is no longer used.
 
