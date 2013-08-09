@@ -28,7 +28,9 @@ class Session_hybrid extends CI_Driver {
 
 		foreach (array('sess_table_name', 'cookie_lifetime', 'cookie_path', 'cookie_domain', 'cookie_secure', 'cookie_httponly') as $key)
 		{
-			$this->$key = $this->CI->config->item($key) ?: ini_get("session.{$key}");
+			$this->$key = $this->CI->config->item($key) ?: (
+				strpos($key, 'cookie_') === 0 ? ini_get("session.{$key}") : NULL
+			);
 		}
 		session_set_cookie_params($this->cookie_lifetime,
 			$this->cookie_path, $this->cookie_domain,
