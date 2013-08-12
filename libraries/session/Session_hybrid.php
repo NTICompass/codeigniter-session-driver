@@ -1,41 +1,48 @@
 <?php
-
 class Session_hybrid extends CI_Driver {
-
+	// CodeIgniter
 	protected $CI;
-
+	// Cookie Options
 	protected $cookie_lifetime;
 	protected $cookie_path;
 	protected $cookie_domain;
 	protected $cookie_secure;
 	protected $cookie_httponly;
-
+	// Session Options
 	protected $sess_cookie_name;
+	// Database Options
 	protected $sess_table_name;
-
+	// Info from db to compare against
 	protected $db_user_agent;
 	protected $db_ip_address;
 	protected $db_last_activity;
 
-	public function __construct()
-	{
+	public function __construct(){
 		$this->CI = get_instance();
 
-		session_set_save_handler(
-			array($this, '_open'), array($this, '_close'),
-			array($this, '_read'), array($this, '_write'),
-			array($this, '_destroy'), array($this, '_clean')
+		// Get options from config file
+		$options = array(
+			'sess_table_name', 'sess_cookie_name',
+			'cookie_lifetime', 'cookie_path',
+			'cookie_domain', 'cookie_secure',
+			'cookie_httponly'
 		);
-
-		foreach (array('sess_table_name', 'sess_cookie_name', 'cookie_lifetime', 'cookie_path', 'cookie_domain', 'cookie_secure', 'cookie_httponly') as $key)
-		{
+		foreach ($options as $key){
 			$this->$key = $this->CI->config->item($key) ?: (
 				// TODO: Use ini_set for defaults?
 				// Or use defaults when calling session_set_cookie_params
 				strpos($key, 'cookie_') === 0 ? ini_get("session.{$key}") : NULL
 			);
 		}
-		session_set_cookie_params($this->cookie_lifetime,
+
+		// Set up session options before starting the session
+		session_set_save_handler(
+			array($this, '_open'), array($this, '_close'),
+			array($this, '_read'), array($this, '_write'),
+			array($this, '_destroy'), array($this, '_clean')
+		);
+		session_set_cookie_params(
+			$this->cookie_lifetime,
 			$this->cookie_path, $this->cookie_domain,
 			$this->cookie_secure, $this->cookie_httponly
 		);
@@ -43,6 +50,7 @@ class Session_hybrid extends CI_Driver {
 			session_name($this->sess_cookie_name);
 		}
 
+		// Start a native session, but with custom handlers
 		session_start();
 	}
 
