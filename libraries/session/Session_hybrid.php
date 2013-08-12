@@ -29,6 +29,8 @@ class Session_hybrid extends CI_Driver {
 		foreach (array('sess_table_name', 'cookie_lifetime', 'cookie_path', 'cookie_domain', 'cookie_secure', 'cookie_httponly') as $key)
 		{
 			$this->$key = $this->CI->config->item($key) ?: (
+				// TODO: Use ini_set for defaults?
+				// Or use defaults when calling session_set_cookie_params
 				strpos($key, 'cookie_') === 0 ? ini_get("session.{$key}") : NULL
 			);
 		}
@@ -185,8 +187,10 @@ class Session_hybrid extends CI_Driver {
 
 	/**
 	 * Session handling functions
+	 *
+	 * They need to be public, that's just how session_set_save_handler works
 	 */
-	protected function _open(){
+	public function _open(){
 		// Are we using a database?  If so, load it
 		if( !$this->sess_table_name ) {
 			die('Session class database table name not configured');
@@ -196,11 +200,11 @@ class Session_hybrid extends CI_Driver {
 		return TRUE;
 	}
 
-	protected function _close(){
+	public function _close(){
 		// This function is intentionally left empty
 	}
 
-	protected function _read($id){
+	public function _read($id){
 		// Get session info from database
 		$this->CI->db->select('user_data, user_agent, ip_address, last_activity');
 		$this->CI->db->from($this->sess_table_name);
@@ -222,7 +226,7 @@ class Session_hybrid extends CI_Driver {
 		return $row->user_data;
 	}
 
-	protected function _write($id, $data){
+	public function _write($id, $data){
 		// Write session data into database
 		$info = array(
 			'session_id' => $id,
@@ -237,7 +241,7 @@ class Session_hybrid extends CI_Driver {
 		$this->CI->db->query($sql);
 	}
 
-	protected function _destroy($id){
+	public function _destroy($id){
 		// Destroy the session, remove database rows
 		$this->CI->db->where('session_id', $id);
 		$this->CI->db->delete($this->sess_table_name);
@@ -245,7 +249,7 @@ class Session_hybrid extends CI_Driver {
 		return TRUE;
 	}
 
-	protected function _clean($max){
+	public function _clean($max){
 		// Remove expired rows
 		srand(time());
 		if ((rand() % 100) < $this->gc_probability)
