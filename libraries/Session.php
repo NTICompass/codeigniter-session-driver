@@ -93,7 +93,7 @@ class Session extends CI_Driver_Library {
 		{
 			$this->sess_expiration = (60*60*24*365*2);
 		}
-		
+
 		// Run the Session routine. If a session doesn't exist we'll
 		// create a new one.  If it does, we'll update it.
 		if ( ! $this->sess_read())
@@ -400,7 +400,7 @@ class Session extends CI_Driver_Library {
 		{
 			return mktime(gmdate("H", $now), gmdate("i", $now), gmdate("s", $now), gmdate("m", $now), gmdate("d", $now), gmdate("Y", $now));
 		}
-		
+
 		return $now;
 	}
 
@@ -427,7 +427,7 @@ class Session extends CI_Driver_Library {
 	 */
 	public function check_write()
 	{
-		return ( ! $this->_has_written );
+		return $this->_has_written;
 	}
 
 	// ------------------------------------------------------------------------
