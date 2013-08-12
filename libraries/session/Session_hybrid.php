@@ -17,7 +17,7 @@ class Session_hybrid extends CI_Driver {
 	protected $db_ip_address;
 	protected $db_last_activity;
 
-	public function __construct(){
+	public function __construct($params=array()){
 		$this->CI = get_instance();
 
 		// Get options from config file
@@ -28,23 +28,19 @@ class Session_hybrid extends CI_Driver {
 			'cookie_httponly'
 		);
 		foreach ($options as $key){
-			$this->$key = $this->CI->config->item($key) ?: (
-				// TODO: Use ini_set for defaults?
-				// Or use defaults when calling session_set_cookie_params
-				strpos($key, 'cookie_') === 0 ? ini_get("session.{$key}") : NULL
-			);
+			$this->$key = (isset($params[$key])) ? $params[$key] : $this->CI->config->item($key);
 		}
 
 		// Set up session options before starting the session
+		session_set_cookie_params(
+			$this->cookie_lifetime ?: 0,
+			$this->cookie_path ?: '/', $this->cookie_domain ?: null,
+			$this->cookie_secure ?: false, $this->cookie_httponly ?: false
+		);
 		session_set_save_handler(
 			array($this, '_open'), array($this, '_close'),
 			array($this, '_read'), array($this, '_write'),
 			array($this, '_destroy'), array($this, '_clean')
-		);
-		session_set_cookie_params(
-			$this->cookie_lifetime,
-			$this->cookie_path, $this->cookie_domain,
-			$this->cookie_secure, $this->cookie_httponly
 		);
 		if($this->sess_cookie_name){
 			session_name($this->sess_cookie_name);
