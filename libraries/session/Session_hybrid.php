@@ -63,7 +63,7 @@ class Session_hybrid extends CI_Driver {
 		$session = $_SESSION;
 
 		// Is the session data we unserialized an array with the correct format?
-		if ( ! is_array($session) OR ! isset($session['session_id']) OR ! isset($session['ip_address']) OR ! isset($session['user_agent']) OR ! isset($session['last_activity']))
+		if (!is_array($session))
 		{
 			log_message('debug', 'A session was not found.');
 			$this->sess_destroy(FALSE);
@@ -134,11 +134,6 @@ class Session_hybrid extends CI_Driver {
 			session_start();
 		}
 
-		$_SESSION['session_id']	= session_id();
-		$_SESSION['ip_address']	= $this->CI->input->ip_address();
-		$_SESSION['user_agent']	= substr($this->CI->input->user_agent(), 0, 120);
-		$_SESSION['last_activity'] = $this->parent->now;
-
 		$this->parent->userdata = $_SESSION;
 	}
 
@@ -153,17 +148,13 @@ class Session_hybrid extends CI_Driver {
 	public function sess_update()
 	{
 		// We only update the session every five minutes by default
-		if (($this->parent->userdata['last_activity'] + $this->parent->sess_time_to_update) >= $this->parent->now)
+		if (($this->db_last_activity + $this->parent->sess_time_to_update) >= $this->parent->now)
 		{
 			return;
 		}
 
 		// Regenerate session id
 		session_regenerate_id();
-
-		// Update the session data in the session data array
-		$this->parent->userdata['session_id'] = session_id();
-		$this->parent->userdata['last_activity'] = $this->parent->now;
 	}
 
 	// --------------------------------------------------------------------
