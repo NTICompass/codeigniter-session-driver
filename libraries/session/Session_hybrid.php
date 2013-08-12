@@ -10,6 +10,7 @@ class Session_hybrid extends CI_Driver {
 	protected $cookie_secure;
 	protected $cookie_httponly;
 
+	protected $sess_cookie_name;
 	protected $sess_table_name;
 
 	protected $db_user_agent;
@@ -26,7 +27,7 @@ class Session_hybrid extends CI_Driver {
 			array($this, '_destroy'), array($this, '_clean')
 		);
 
-		foreach (array('sess_table_name', 'cookie_lifetime', 'cookie_path', 'cookie_domain', 'cookie_secure', 'cookie_httponly') as $key)
+		foreach (array('sess_table_name', 'sess_cookie_name', 'cookie_lifetime', 'cookie_path', 'cookie_domain', 'cookie_secure', 'cookie_httponly') as $key)
 		{
 			$this->$key = $this->CI->config->item($key) ?: (
 				// TODO: Use ini_set for defaults?
@@ -38,6 +39,9 @@ class Session_hybrid extends CI_Driver {
 			$this->cookie_path, $this->cookie_domain,
 			$this->cookie_secure, $this->cookie_httponly
 		);
+		if($this->sess_cookie_name){
+			session_name($this->sess_cookie_name);
+		}
 
 		session_start();
 	}
