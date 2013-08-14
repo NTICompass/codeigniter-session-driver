@@ -177,14 +177,6 @@ class Session_hybrid extends CI_Driver {
 	// --------------------------------------------------------------------
 
 	/**
-	 * Does nothing for native sessions
-	 *
-	 * @access private
-	 * @return void
-	 */
-	public function _sess_gc(){}
-
-	/**
 	 * Session handling functions
 	 *
 	 * They need to be public, that's just how session_set_save_handler works
@@ -262,5 +254,9 @@ class Session_hybrid extends CI_Driver {
 		}
 
 		return TRUE;
+	}
+
+	public function _sess_gc(){
+		$this->_clean($this->parent->sess_expiration);
 	}
 }
