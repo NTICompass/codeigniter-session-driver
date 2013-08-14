@@ -15,4 +15,10 @@ $config['sess_match_ip'] = true;
 $config['sess_match_useragent'] = true;
 
 $config['sess_table_name'] = 'ci_sessions';
+
+$config['sess_cookie_name'] = 'ci_session';
+//$config['cookie_lifetime'] = '';
+//$config['cookie_path'] = '';
 //$config['cookie_domain'] = '';
+//$config['cookie_secure'] = '';
+//$config['cookie_httponly'] = '';
