@@ -227,9 +227,24 @@ class Session_hybrid extends CI_Driver {
 			'user_data' => $data
 		);
 
-		$sql = $this->CI->db->insert_string($this->sess_table_name, $info);
+		// This is called *AFTER* CodeIgniter is done, which means
+		// the DB was closed.  Let's re-open it!
+		$reOpenedDB = FALSE;
+		$theDB = $this->CI->db;
+		if($this->CI->db->conn_id === FALSE){
+			$theDB = $this->CI->load->database('', TRUE);
+			$reOpenedDB = TRUE;
+		}
+
+		$sql = $theDB->insert_string($this->sess_table_name, $info);
 		$sql = str_replace('INSERT INTO', 'REPLACE INTO', $sql);
-		$this->CI->db->query($sql);
+
+		$theDB->query($sql);
+
+		//Now let's close it
+		if($reOpenedDB){
+			$theDB->close();
+		}
 	}
 
 	public function _destroy($id){
