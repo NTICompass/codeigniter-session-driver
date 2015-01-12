@@ -124,7 +124,7 @@ class Session extends CI_Driver_Library {
 	 */
 	public function __destruct()
 	{
-		if(method_exists($this, 'sess_write'))
+		if(method_exists($this->{$this->_driver}, 'sess_write'))
 			$this->sess_write();
 	}
 
